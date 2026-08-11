@@ -1,0 +1,27 @@
+# Ambientes virtuais
+.venv/
+venv/
+env/
+
+# Cache Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Arquivos de teste e temporários gerados localmente
+ecf_anterior.xlsx
+ecf_atual.xlsx
+ecf_revisao.xlsx
+ecf_comparador.log
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Arquivos temporários de processamento (Render usa /tmp do sistema)
+tmp/
