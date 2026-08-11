@@ -40,7 +40,7 @@ sys.path.insert(0, str(Path(__file__).parent))
 
 from comparator import ResultadoBloco, comparar_bloco
 from normalizer import normalizar_df
-from reader import ler_excel
+from reader import ler_arquivo_ecf
 from writer import gerar_excel
 
 # ---------------------------------------------------------------------------
@@ -109,9 +109,9 @@ def processar():
     # Valida extensões
     for arq in (arquivo_ant, arquivo_atu):
         ext = Path(arq.filename or "").suffix.lower()
-        if ext not in (".xlsx", ".xls", ".xlsm", ".xlsb"):
+        if ext not in (".xlsx", ".xls", ".xlsm", ".xlsb", ".txt"):
             return jsonify({
-                "erro": f"Arquivo '{arq.filename}' não é um Excel válido (.xlsx/.xls/.xlsm/.xlsb)."
+                "erro": f"Arquivo '{arq.filename}' não é suportado (.xlsx/.xls/.xlsm/.xlsb/.txt)."
             }), 400
 
     # Salva uploads em disco temporário
@@ -257,11 +257,11 @@ def _processar_job(
         _pub("progresso", valor=5, texto="Lendo arquivo anterior...")
 
         # --- Leitura ---
-        abas_ant = ler_excel(path_ant)
-        _pub("progresso", valor=20, texto=f"Arquivo anterior lido: {len(abas_ant)} abas")
+        abas_ant = ler_arquivo_ecf(path_ant)
+        _pub("progresso", valor=20, texto=f"Arquivo anterior lido: {len(abas_ant)} abas/blocos")
 
-        abas_atu = ler_excel(path_atu)
-        _pub("progresso", valor=35, texto=f"Arquivo atual lido: {len(abas_atu)} abas")
+        abas_atu = ler_arquivo_ecf(path_atu)
+        _pub("progresso", valor=35, texto=f"Arquivo atual lido: {len(abas_atu)} abas/blocos")
 
         # --- Processamento por bloco ---
         todos_blocos = sorted(set(abas_ant.keys()) | set(abas_atu.keys()))

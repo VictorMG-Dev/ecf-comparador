@@ -1055,12 +1055,12 @@
           <div class="drop-icon-wrap">📋</div>
           <div class="drop-type">ECF Anterior</div>
           <p class="drop-title">Arraste ou clique para selecionar</p>
-          <p class="drop-hint">Exercício anterior<br/>.xlsx · .xls · .xlsm · .xlsb</p>
+          <p class="drop-hint">Exercício anterior<br/>.xlsx · .xls · .txt (SPED)</p>
           <div class="file-chip" id="chip-ant">
             <span class="file-chip-name" id="chip-ant-name"></span>
             <span class="file-chip-x" id="rm-ant">✕</span>
           </div>
-          <input type="file" id="inp-ant" accept=".xlsx,.xls,.xlsm,.xlsb" />
+          <input type="file" id="inp-ant" accept=".xlsx,.xls,.xlsm,.xlsb,.txt" />
         </div>
 
         <!-- ATUAL -->
@@ -1069,12 +1069,12 @@
           <div class="drop-icon-wrap">📂</div>
           <div class="drop-type">ECF Atual</div>
           <p class="drop-title">Arraste ou clique para selecionar</p>
-          <p class="drop-hint">Exercício atual<br/>.xlsx · .xls · .xlsm · .xlsb</p>
+          <p class="drop-hint">Exercício atual<br/>.xlsx · .xls · .txt (SPED)</p>
           <div class="file-chip" id="chip-atu">
             <span class="file-chip-name" id="chip-atu-name"></span>
             <span class="file-chip-x" id="rm-atu">✕</span>
           </div>
-          <input type="file" id="inp-atu" accept=".xlsx,.xls,.xlsm,.xlsb" />
+          <input type="file" id="inp-atu" accept=".xlsx,.xls,.xlsm,.xlsb,.txt" />
         </div>
 
       </div>
@@ -1259,8 +1259,8 @@
 
     function setFile(f, side) {
       const ext = f.name.split('.').pop().toLowerCase();
-      if (!['xlsx','xls','xlsm','xlsb'].includes(ext)) {
-        showAlert(`"${f.name}" não é um arquivo Excel válido.`); return;
+      if (!['xlsx','xls','xlsm','xlsb','txt'].includes(ext)) {
+        showAlert(`"${f.name}" não é um arquivo suportado (.xlsx, .xls, .txt).`); return;
       }
       hideAlert();
       if (side === 'ant') {
