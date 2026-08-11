@@ -3,291 +3,449 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ECF Comparador — Revisão Fiscal Inteligente</title>
-  <meta name="description" content="Compare arquivos ECF de dois exercícios fiscais e gere automaticamente um relatório de revisão detalhado por bloco." />
+  <title>ECF Comparador | Deloitte Tax & Legal</title>
+  <meta name="description" content="Plataforma de revisão e comparação de arquivos ECF — Escrituração Contábil Fiscal. Desenvolvido para Deloitte Tax & Legal Brasil." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
 
   <style>
     /* ======================================================================
-       DESIGN TOKENS
+       DELOITTE DESIGN TOKENS
+       Verde oficial: #86BC25 (Pantone 368 / RGB 134,188,37)
+       Filosofia: Clean · Confident · Corporate Premium
     ====================================================================== */
     :root {
-      --bg-base:       #060b18;
-      --bg-surface:    #0d1528;
-      --bg-card:       #111c35;
-      --bg-card-hover: #162040;
-      --border:        rgba(99, 140, 255, 0.12);
-      --border-hover:  rgba(99, 140, 255, 0.35);
-      --accent-blue:   #4f8ef7;
-      --accent-purple: #9b5cf6;
-      --accent-teal:   #0dd3c5;
-      --grad-primary:  linear-gradient(135deg, #4f8ef7, #9b5cf6);
-      --grad-teal:     linear-gradient(135deg, #0dd3c5, #4f8ef7);
-      --green:         #22c55e;
-      --red:           #ef4444;
-      --yellow:        #f59e0b;
-      --white:         #e2e8f0;
-      --muted:         #64748b;
-      --text:          #cbd5e1;
-      --text-bright:   #f1f5f9;
-      --font-sans:     'Inter', system-ui, sans-serif;
-      --font-mono:     'JetBrains Mono', monospace;
-      --radius-sm:     8px;
-      --radius-md:     14px;
-      --radius-lg:     20px;
-      --radius-xl:     28px;
-      --glow-blue:     0 0 40px rgba(79, 142, 247, 0.18);
-      --glow-purple:   0 0 40px rgba(155, 92, 246, 0.18);
-      --shadow-card:   0 8px 40px rgba(0, 0, 0, 0.45);
+      /* Cores principais */
+      --dl-green:        #86BC25;   /* Deloitte Green — Pantone 368 */
+      --dl-green-dark:   #6a9a1c;   /* hover state */
+      --dl-green-deeper: #4d7213;   /* pressed / active */
+      --dl-green-glow:   rgba(134, 188, 37, 0.18);
+      --dl-green-subtle: rgba(134, 188, 37, 0.07);
+      --dl-green-border: rgba(134, 188, 37, 0.22);
+      --dl-green-border-strong: rgba(134, 188, 37, 0.5);
+
+      /* Backgrounds — escuros com leve matiz verde */
+      --bg-base:    #05090a;
+      --bg-surface: #090e0b;
+      --bg-card:    #0e1610;
+      --bg-card-2:  #121b13;
+      --bg-card-hover: #162019;
+      --bg-terminal: #060a07;
+
+      /* Tipografia */
+      --text-bright: #f0f4ee;
+      --text:        #b8c9b0;
+      --text-muted:  #5a7055;
+      --text-dim:    #2e4230;
+
+      /* Status */
+      --green-pos:  #22c55e;
+      --red-neg:    #ef4444;
+      --amber:      #f59e0b;
+      --neutral:    #64748b;
+
+      /* Bordas */
+      --border:       rgba(134, 188, 37, 0.1);
+      --border-mid:   rgba(134, 188, 37, 0.18);
+      --border-hover: rgba(134, 188, 37, 0.4);
+
+      /* Fontes */
+      --font-sans: 'Inter', system-ui, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+
+      /* Radii */
+      --r-sm: 6px;
+      --r-md: 12px;
+      --r-lg: 18px;
+      --r-xl: 24px;
+
+      /* Sombras */
+      --shadow: 0 8px 40px rgba(0, 0, 0, 0.6);
+      --shadow-green: 0 0 40px rgba(134, 188, 37, 0.12);
+      --glow-green: 0 0 24px rgba(134, 188, 37, 0.25);
     }
 
     /* ======================================================================
-       RESET & BASE
+       RESET
     ====================================================================== */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     html { scroll-behavior: smooth; }
-
     body {
       font-family: var(--font-sans);
       background: var(--bg-base);
       color: var(--text);
       min-height: 100vh;
       overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
     }
 
     /* ======================================================================
-       BACKGROUND PARTICLES / GLOW ORBS
+       TOPO — BARRA DELOITTE
     ====================================================================== */
-    .bg-orbs {
-      position: fixed; inset: 0; pointer-events: none; z-index: 0;
-      overflow: hidden;
+    .topbar {
+      background: #000;
+      border-bottom: 1px solid rgba(134,188,37,0.08);
+      padding: 0 40px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
     }
-    .orb {
-      position: absolute;
+
+    .topbar-brand {
+      display: flex;
+      align-items: center;
+      gap: 0;
+    }
+
+    /* Wordmark Deloitte inspirado no logotipo real */
+    .wordmark {
+      font-size: 17px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      color: #fff;
+      font-family: var(--font-sans);
+      line-height: 1;
+    }
+    .wordmark .dot {
+      display: inline-block;
+      width: 7px;
+      height: 7px;
+      background: var(--dl-green);
       border-radius: 50%;
-      filter: blur(90px);
-      opacity: 0.12;
-      animation: float 12s ease-in-out infinite alternate;
+      margin-left: 1px;
+      vertical-align: super;
+      position: relative;
+      top: -1px;
     }
-    .orb-1 { width: 600px; height: 600px; background: #4f8ef7; top: -200px; left: -150px; animation-delay: 0s; }
-    .orb-2 { width: 500px; height: 500px; background: #9b5cf6; bottom: -200px; right: -150px; animation-delay: 3s; }
-    .orb-3 { width: 350px; height: 350px; background: #0dd3c5; top: 40%; left: 55%; animation-delay: 6s; }
 
-    @keyframes float {
-      from { transform: translate(0, 0) scale(1); }
-      to   { transform: translate(30px, 20px) scale(1.08); }
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+    .topbar-tag {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+    .topbar-divider {
+      width: 1px;
+      height: 16px;
+      background: rgba(255,255,255,0.08);
+    }
+    .topbar-label {
+      font-size: 10px;
+      font-weight: 500;
+      color: var(--dl-green);
+      letter-spacing: 0.5px;
     }
 
     /* ======================================================================
-       LAYOUT
+       BACKGROUND — GRID SUTIL ESTILO CORPORATE
     ====================================================================== */
-    .app-wrapper {
-      position: relative; z-index: 1;
-      max-width: 1100px;
+    .bg-grid {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      background-image:
+        linear-gradient(rgba(134,188,37,0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(134,188,37,0.025) 1px, transparent 1px);
+      background-size: 48px 48px;
+    }
+
+    /* Orb de glow sutil no canto */
+    .bg-orb {
+      position: fixed;
+      top: -200px;
+      right: -200px;
+      width: 700px;
+      height: 700px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(134,188,37,0.06) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .bg-orb-2 {
+      position: fixed;
+      bottom: -300px;
+      left: -200px;
+      width: 600px;
+      height: 600px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(134,188,37,0.04) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ======================================================================
+       LAYOUT PRINCIPAL
+    ====================================================================== */
+    .app {
+      position: relative;
+      z-index: 1;
+      max-width: 1060px;
       margin: 0 auto;
-      padding: 0 24px 80px;
+      padding: 0 28px 100px;
     }
 
     /* ======================================================================
        HEADER
     ====================================================================== */
     header {
-      padding: 52px 0 40px;
-      text-align: center;
+      padding: 60px 0 48px;
     }
 
-    .logo-badge {
+    .header-eyebrow {
       display: inline-flex;
       align-items: center;
-      gap: 10px;
-      background: rgba(79, 142, 247, 0.08);
-      border: 1px solid rgba(79, 142, 247, 0.2);
-      border-radius: 999px;
-      padding: 6px 18px 6px 10px;
-      margin-bottom: 28px;
+      gap: 8px;
+      margin-bottom: 24px;
     }
-    .logo-badge .badge-icon {
-      width: 28px; height: 28px;
-      background: var(--grad-primary);
-      border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 14px;
+    .eyebrow-line {
+      width: 28px;
+      height: 2px;
+      background: var(--dl-green);
+      border-radius: 1px;
     }
-    .logo-badge span {
-      font-size: 12px;
-      font-weight: 600;
-      letter-spacing: 1.5px;
+    .eyebrow-text {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 2.5px;
       text-transform: uppercase;
-      color: var(--accent-blue);
+      color: var(--dl-green);
     }
 
     h1 {
-      font-size: clamp(2rem, 5vw, 3.2rem);
+      font-size: clamp(2.2rem, 5vw, 3.4rem);
       font-weight: 900;
-      line-height: 1.1;
-      letter-spacing: -0.03em;
+      line-height: 1.05;
+      letter-spacing: -0.035em;
       color: var(--text-bright);
-      margin-bottom: 14px;
-    }
-    h1 .grad {
-      background: var(--grad-primary);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+      margin-bottom: 18px;
     }
 
-    .subtitle {
+    h1 em {
+      font-style: normal;
+      color: var(--dl-green);
+    }
+
+    .header-desc {
       font-size: 1rem;
-      color: var(--muted);
-      max-width: 520px;
-      margin: 0 auto;
-      line-height: 1.6;
+      color: var(--text-muted);
+      max-width: 540px;
+      line-height: 1.65;
+      font-weight: 400;
+    }
+
+    /* Métricas rápidas no header */
+    .header-stats {
+      display: flex;
+      gap: 32px;
+      margin-top: 36px;
+      padding-top: 28px;
+      border-top: 1px solid var(--border);
+    }
+    .hstat {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+    .hstat-num {
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: var(--text-bright);
+      font-variant-numeric: tabular-nums;
+    }
+    .hstat-num span { color: var(--dl-green); }
+    .hstat-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-dim);
+      font-weight: 600;
+    }
+    .hstat-sep {
+      width: 1px;
+      background: var(--border);
+      align-self: stretch;
     }
 
     /* ======================================================================
-       UPLOAD SECTION
+       SEÇÃO LABELS
     ====================================================================== */
-    .section-title {
-      font-size: 0.7rem;
-      font-weight: 700;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-bottom: 16px;
+    .section-eyebrow {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 14px;
     }
-
-    .upload-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 20px;
-      margin-bottom: 20px;
+    .section-step {
+      width: 20px;
+      height: 20px;
+      background: var(--dl-green);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      font-weight: 800;
+      color: #000;
+      flex-shrink: 0;
     }
-
-    @media (max-width: 680px) {
-      .upload-grid { grid-template-columns: 1fr; }
-    }
-
-    .drop-zone {
-      background: var(--bg-card);
-      border: 2px dashed var(--border);
-      border-radius: var(--radius-lg);
-      padding: 40px 28px;
-      text-align: center;
-      cursor: pointer;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      position: relative;
-      overflow: hidden;
-    }
-    .drop-zone::before {
-      content: '';
-      position: absolute;
-      inset: -2px;
-      border-radius: var(--radius-lg);
-      background: var(--grad-primary);
-      opacity: 0;
-      transition: opacity 0.3s;
-      z-index: 0;
-    }
-    .drop-zone::after {
-      content: '';
-      position: absolute;
-      inset: 1px;
-      border-radius: calc(var(--radius-lg) - 1px);
-      background: var(--bg-card);
-      z-index: 1;
-    }
-    .drop-zone > * { position: relative; z-index: 2; }
-
-    .drop-zone:hover, .drop-zone.drag-over {
-      border-color: transparent;
-      box-shadow: var(--glow-blue), var(--shadow-card);
-      transform: translateY(-2px);
-    }
-    .drop-zone:hover::before, .drop-zone.drag-over::before {
-      opacity: 1;
-    }
-    .drop-zone.drag-over {
-      background: var(--bg-card-hover);
-    }
-    .drop-zone.has-file {
-      border-color: transparent;
-      background: var(--bg-card-hover);
-    }
-    .drop-zone.has-file::before { opacity: 1; }
-
-    .drop-label {
+    .section-label {
       font-size: 10px;
       font-weight: 700;
       letter-spacing: 2px;
       text-transform: uppercase;
-      margin-bottom: 20px;
-      display: inline-block;
-      padding: 4px 14px;
-      border-radius: 999px;
-    }
-    .drop-zone:first-child .drop-label {
-      background: rgba(79, 142, 247, 0.12);
-      color: var(--accent-blue);
-    }
-    .drop-zone:last-child .drop-label {
-      background: rgba(155, 92, 246, 0.12);
-      color: var(--accent-purple);
+      color: var(--text-muted);
     }
 
-    .drop-icon {
-      width: 64px; height: 64px;
-      margin: 0 auto 18px;
-      border-radius: var(--radius-md);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 28px;
-      transition: transform 0.3s;
+    /* ======================================================================
+       DROP ZONES
+    ====================================================================== */
+    .upload-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 16px;
     }
-    .drop-zone:first-child .drop-icon {
-      background: rgba(79, 142, 247, 0.1);
-      box-shadow: 0 0 20px rgba(79, 142, 247, 0.15);
-    }
-    .drop-zone:last-child .drop-icon {
-      background: rgba(155, 92, 246, 0.1);
-      box-shadow: 0 0 20px rgba(155, 92, 246, 0.15);
-    }
-    .drop-zone:hover .drop-icon { transform: scale(1.1); }
+    @media (max-width: 640px) { .upload-grid { grid-template-columns: 1fr; } }
 
-    .drop-text {
-      font-size: 0.9rem;
-      font-weight: 600;
-      color: var(--text-bright);
-      margin-bottom: 6px;
-    }
-    .drop-hint {
-      font-size: 0.75rem;
-      color: var(--muted);
-    }
-
-    .file-info {
-      display: none;
-      margin-top: 16px;
-      padding: 10px 16px;
-      background: rgba(13, 211, 197, 0.07);
-      border: 1px solid rgba(13, 211, 197, 0.2);
-      border-radius: var(--radius-sm);
-      font-size: 0.78rem;
-      color: var(--accent-teal);
-      font-family: var(--font-mono);
-      word-break: break-all;
-    }
-    .drop-zone.has-file .file-info { display: flex; align-items: center; gap: 8px; }
-
-    .file-remove {
-      margin-left: auto;
+    .drop-zone {
+      position: relative;
+      background: var(--bg-card);
+      border: 1px dashed var(--border-mid);
+      border-radius: var(--r-lg);
+      padding: 44px 28px 36px;
+      text-align: center;
       cursor: pointer;
-      opacity: 0.6;
-      font-size: 16px;
-      transition: opacity 0.2s;
-      flex-shrink: 0;
+      transition: all 0.28s ease;
+      overflow: hidden;
     }
-    .file-remove:hover { opacity: 1; }
+
+    /* Linha verde no topo da card */
+    .drop-zone::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: var(--dl-green);
+      opacity: 0;
+      transition: opacity 0.28s;
+    }
+
+    /* Corner decoration */
+    .drop-zone::after {
+      content: '';
+      position: absolute;
+      bottom: 0; right: 0;
+      width: 60px; height: 60px;
+      background: radial-gradient(circle at 100% 100%, var(--dl-green-subtle), transparent 70%);
+      border-radius: var(--r-lg) 0 var(--r-lg) 0;
+    }
+
+    .drop-zone:hover,
+    .drop-zone.drag-over {
+      border-color: var(--border-hover);
+      background: var(--bg-card-hover);
+      box-shadow: var(--shadow-green), var(--shadow);
+      transform: translateY(-1px);
+    }
+    .drop-zone:hover::before,
+    .drop-zone.drag-over::before { opacity: 1; }
+
+    .drop-zone.has-file {
+      border-color: var(--dl-green-border);
+      border-style: solid;
+      background: var(--bg-card-hover);
+    }
+    .drop-zone.has-file::before { opacity: 1; }
+
+    .drop-zone-year {
+      position: absolute;
+      top: 14px;
+      right: 16px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+      background: rgba(0,0,0,0.3);
+      padding: 3px 9px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+    }
+
+    .drop-icon-wrap {
+      width: 58px;
+      height: 58px;
+      margin: 0 auto 20px;
+      border-radius: var(--r-md);
+      background: var(--dl-green-subtle);
+      border: 1px solid var(--dl-green-border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      transition: all 0.28s;
+    }
+    .drop-zone:hover .drop-icon-wrap {
+      background: rgba(134,188,37,0.12);
+      box-shadow: var(--glow-green);
+    }
+
+    .drop-type {
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: var(--dl-green);
+      margin-bottom: 10px;
+    }
+
+    .drop-title {
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: var(--text-bright);
+      margin-bottom: 5px;
+    }
+
+    .drop-hint {
+      font-size: 0.73rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    .file-chip {
+      display: none;
+      margin-top: 18px;
+      padding: 9px 14px;
+      background: rgba(134,188,37,0.06);
+      border: 1px solid var(--dl-green-border);
+      border-radius: var(--r-sm);
+      font-size: 0.73rem;
+      font-family: var(--font-mono);
+      color: var(--dl-green);
+      align-items: center;
+      gap: 8px;
+      text-align: left;
+    }
+    .drop-zone.has-file .file-chip { display: flex; }
+    .file-chip-name { flex: 1; word-break: break-all; }
+    .file-chip-x {
+      cursor: pointer;
+      opacity: 0.5;
+      font-size: 14px;
+      flex-shrink: 0;
+      transition: opacity 0.2s;
+    }
+    .file-chip-x:hover { opacity: 1; }
 
     input[type="file"] { display: none; }
 
@@ -296,1020 +454,1002 @@
     ====================================================================== */
     .config-row {
       display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 16px;
-      margin-bottom: 28px;
+      grid-template-columns: 1fr 1fr 1.4fr;
+      gap: 14px;
+      margin-bottom: 24px;
     }
-    @media (max-width: 680px) {
-      .config-row { grid-template-columns: 1fr; }
-    }
+    @media (max-width: 640px) { .config-row { grid-template-columns: 1fr; } }
 
-    .input-group {
+    .field {
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 7px;
     }
-    .input-group label {
-      font-size: 0.72rem;
-      font-weight: 600;
-      letter-spacing: 1px;
+    .field-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
       text-transform: uppercase;
-      color: var(--muted);
+      color: var(--text-muted);
     }
-    .input-group input {
+    .field input {
       background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      padding: 10px 14px;
+      border: 1px solid var(--border-mid);
+      border-radius: var(--r-sm);
+      padding: 10px 13px;
       font-family: var(--font-mono);
-      font-size: 0.88rem;
+      font-size: 0.85rem;
       color: var(--text-bright);
       outline: none;
       transition: border-color 0.2s, box-shadow 0.2s;
       width: 100%;
     }
-    .input-group input:focus {
-      border-color: var(--accent-blue);
-      box-shadow: 0 0 0 3px rgba(79, 142, 247, 0.1);
+    .field input:focus {
+      border-color: var(--dl-green);
+      box-shadow: 0 0 0 3px rgba(134,188,37,0.1);
     }
 
     /* ======================================================================
        BOTÃO PRINCIPAL
     ====================================================================== */
-    .btn-processar {
+    .btn-process {
       width: 100%;
-      padding: 17px 32px;
-      background: var(--grad-primary);
+      padding: 16px 32px;
+      background: var(--dl-green);
       border: none;
-      border-radius: var(--radius-md);
+      border-radius: var(--r-sm);
       font-family: var(--font-sans);
-      font-size: 1rem;
-      font-weight: 700;
-      color: #fff;
+      font-size: 0.92rem;
+      font-weight: 800;
+      color: #000;
       cursor: pointer;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      transition: background 0.2s, box-shadow 0.2s, transform 0.15s;
+      margin-bottom: 36px;
       position: relative;
       overflow: hidden;
-      transition: transform 0.2s, box-shadow 0.2s, opacity 0.2s;
-      letter-spacing: 0.02em;
-      margin-bottom: 32px;
     }
-    .btn-processar::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(135deg, rgba(255,255,255,0.15), transparent);
-      opacity: 0;
-      transition: opacity 0.2s;
-    }
-    .btn-processar:hover:not(:disabled)::before { opacity: 1; }
-    .btn-processar:hover:not(:disabled) {
+    .btn-process:hover:not(:disabled) {
+      background: var(--dl-green-dark);
+      box-shadow: 0 6px 28px rgba(134,188,37,0.35);
       transform: translateY(-1px);
-      box-shadow: 0 8px 32px rgba(79, 142, 247, 0.4);
     }
-    .btn-processar:active:not(:disabled) { transform: translateY(0); }
-    .btn-processar:disabled { opacity: 0.5; cursor: not-allowed; }
-
-    .btn-processar .btn-inner {
-      display: flex; align-items: center; justify-content: center; gap: 10px;
+    .btn-process:active:not(:disabled) { transform: translateY(0); }
+    .btn-process:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
     }
-    .btn-processar .spinner {
+    .btn-process .btn-inner {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    .btn-process .spinner {
       display: none;
-      width: 18px; height: 18px;
-      border: 2px solid rgba(255,255,255,0.3);
-      border-top-color: #fff;
+      width: 16px; height: 16px;
+      border: 2px solid rgba(0,0,0,0.25);
+      border-top-color: #000;
       border-radius: 50%;
-      animation: spin 0.7s linear infinite;
+      animation: spin 0.6s linear infinite;
     }
-    .btn-processar.loading .spinner { display: block; }
-    .btn-processar.loading .btn-text-idle { display: none; }
-    .btn-processar .btn-text-loading { display: none; }
-    .btn-processar.loading .btn-text-loading { display: inline; }
+    .btn-process.loading .spinner { display: block; }
+    .btn-process.loading .txt-idle { display: none; }
+    .btn-process .txt-run { display: none; }
+    .btn-process.loading .txt-run { display: inline; }
 
     @keyframes spin { to { transform: rotate(360deg); } }
 
     /* ======================================================================
+       DIVIDER
+    ====================================================================== */
+    .divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border-mid), transparent);
+      margin: 28px 0;
+    }
+
+    /* ======================================================================
+       ALERTA
+    ====================================================================== */
+    .alert {
+      display: none;
+      background: rgba(239,68,68,0.07);
+      border: 1px solid rgba(239,68,68,0.25);
+      border-radius: var(--r-sm);
+      padding: 13px 18px;
+      font-size: 0.82rem;
+      color: #f87171;
+      margin-bottom: 18px;
+    }
+
+    /* ======================================================================
        PROGRESSO
     ====================================================================== */
-    #progress-section {
-      display: none;
-      margin-bottom: 28px;
-    }
+    #progress-section { display: none; margin-bottom: 20px; }
 
     .progress-card {
       background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-lg);
-      padding: 28px;
-      box-shadow: var(--shadow-card);
+      border: 1px solid var(--border-mid);
+      border-radius: var(--r-lg);
+      padding: 28px 32px;
+      box-shadow: var(--shadow);
     }
 
-    .progress-header {
+    .progress-head {
       display: flex;
       align-items: center;
       justify-content: space-between;
       margin-bottom: 16px;
     }
-    .progress-label {
-      font-size: 0.85rem;
-      font-weight: 600;
-      color: var(--text-bright);
-    }
-    .progress-pct {
-      font-family: var(--font-mono);
-      font-size: 0.85rem;
-      color: var(--accent-blue);
+    .progress-title {
+      font-size: 0.82rem;
       font-weight: 700;
+      color: var(--text-bright);
+      text-transform: uppercase;
+      letter-spacing: 1px;
     }
-
-    .progress-bar-track {
-      height: 6px;
-      background: rgba(79, 142, 247, 0.1);
-      border-radius: 999px;
-      overflow: hidden;
-      margin-bottom: 14px;
-    }
-    .progress-bar-fill {
-      height: 100%;
-      border-radius: 999px;
-      background: var(--grad-primary);
-      width: 0%;
-      transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-      box-shadow: 0 0 12px rgba(79, 142, 247, 0.5);
-    }
-
-    .progress-step-text {
-      font-size: 0.78rem;
-      color: var(--muted);
+    .progress-num {
       font-family: var(--font-mono);
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: var(--dl-green);
     }
 
-    /* Blocos processados */
-    .blocks-track {
+    .bar-track {
+      height: 4px;
+      background: rgba(134,188,37,0.08);
+      border-radius: 2px;
+      overflow: hidden;
+      margin-bottom: 12px;
+    }
+    .bar-fill {
+      height: 100%;
+      background: var(--dl-green);
+      width: 0%;
+      border-radius: 2px;
+      transition: width 0.5s cubic-bezier(0.4,0,0.2,1);
+      box-shadow: 0 0 10px rgba(134,188,37,0.4);
+    }
+
+    .progress-step {
+      font-size: 0.73rem;
+      font-family: var(--font-mono);
+      color: var(--text-muted);
+    }
+
+    /* Blocos pills */
+    .blocks-row {
       display: flex;
       flex-wrap: wrap;
-      gap: 6px;
-      margin-top: 16px;
+      gap: 5px;
+      margin-top: 18px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
     }
-    .block-pill {
+    .blk-pill {
       font-family: var(--font-mono);
-      font-size: 0.68rem;
+      font-size: 10px;
       font-weight: 600;
-      padding: 3px 10px;
-      border-radius: 999px;
-      background: rgba(79, 142, 247, 0.08);
-      border: 1px solid rgba(79, 142, 247, 0.15);
-      color: var(--muted);
-      transition: all 0.3s;
+      padding: 3px 9px;
+      border-radius: 3px;
+      background: rgba(134,188,37,0.04);
+      border: 1px solid rgba(134,188,37,0.1);
+      color: var(--text-dim);
+      transition: all 0.25s;
     }
-    .block-pill.done {
-      background: rgba(34, 197, 94, 0.1);
-      border-color: rgba(34, 197, 94, 0.3);
-      color: var(--green);
+    .blk-pill.active {
+      background: rgba(134,188,37,0.12);
+      border-color: var(--dl-green);
+      color: var(--dl-green);
+      animation: blink-green 1.2s ease-in-out infinite;
     }
-    .block-pill.active {
-      background: rgba(79, 142, 247, 0.15);
-      border-color: rgba(79, 142, 247, 0.4);
-      color: var(--accent-blue);
-      animation: pulse-blue 1s ease-in-out infinite;
+    .blk-pill.done {
+      background: rgba(34,197,94,0.06);
+      border-color: rgba(34,197,94,0.2);
+      color: var(--green-pos);
     }
-    @keyframes pulse-blue {
-      0%, 100% { box-shadow: none; }
-      50%       { box-shadow: 0 0 10px rgba(79, 142, 247, 0.4); }
+    @keyframes blink-green {
+      0%,100% { box-shadow: none; }
+      50% { box-shadow: 0 0 8px rgba(134,188,37,0.4); }
     }
 
     /* ======================================================================
-       TERMINAL DE LOG
+       TERMINAL
     ====================================================================== */
-    .terminal-card {
-      background: #07111f;
-      border: 1px solid var(--border);
-      border-radius: var(--radius-lg);
-      overflow: hidden;
-      margin-bottom: 28px;
-      box-shadow: var(--shadow-card);
+    .terminal {
       display: none;
+      background: var(--bg-terminal);
+      border: 1px solid var(--border-mid);
+      border-radius: var(--r-lg);
+      overflow: hidden;
+      margin-bottom: 20px;
+      box-shadow: var(--shadow);
     }
-    .terminal-header {
-      background: #0d1d33;
-      padding: 10px 18px;
+    .term-header {
+      background: #000;
+      padding: 9px 16px;
       display: flex;
       align-items: center;
-      gap: 8px;
-      border-bottom: 1px solid var(--border);
+      gap: 7px;
+      border-bottom: 1px solid rgba(134,188,37,0.1);
     }
-    .dot { width: 10px; height: 10px; border-radius: 50%; }
-    .dot-r { background: #ff5f57; }
-    .dot-y { background: #ffbd2e; }
-    .dot-g { background: #28c840; }
-    .terminal-title {
-      font-size: 0.72rem;
-      color: var(--muted);
+    .term-dot { width: 9px; height: 9px; border-radius: 50%; }
+    .t-r { background: #ff5f57; }
+    .t-y { background: #ffbd2e; }
+    .t-g { background: #28c840; }
+    .term-title {
       font-family: var(--font-mono);
-      margin-left: 6px;
+      font-size: 10px;
+      color: var(--text-dim);
+      margin-left: 8px;
+      letter-spacing: 0.5px;
     }
-    .terminal-body {
-      padding: 16px 20px;
-      max-height: 260px;
+
+    .term-body {
+      padding: 14px 20px;
+      max-height: 240px;
       overflow-y: auto;
       font-family: var(--font-mono);
-      font-size: 0.75rem;
-      line-height: 1.7;
+      font-size: 0.72rem;
+      line-height: 1.75;
     }
-    .terminal-body::-webkit-scrollbar { width: 4px; }
-    .terminal-body::-webkit-scrollbar-track { background: transparent; }
-    .terminal-body::-webkit-scrollbar-thumb { background: rgba(79,142,247,0.3); border-radius: 2px; }
+    .term-body::-webkit-scrollbar { width: 3px; }
+    .term-body::-webkit-scrollbar-thumb { background: rgba(134,188,37,0.25); border-radius: 2px; }
 
-    .log-line { display: flex; gap: 10px; }
-    .log-time { color: #334466; flex-shrink: 0; }
-    .log-level { flex-shrink: 0; min-width: 54px; }
-    .log-level.info    { color: var(--accent-blue); }
-    .log-level.debug   { color: #445577; }
-    .log-level.warning { color: var(--yellow); }
-    .log-level.error   { color: var(--red); }
-    .log-msg { color: #7899cc; }
-    .log-msg.warning { color: #f59e0b; }
-    .log-msg.error   { color: #ef4444; }
+    .log-row { display: flex; gap: 10px; }
+    .log-ts  { color: #1a2e1c; flex-shrink: 0; }
+    .log-lv  { flex-shrink: 0; min-width: 48px; }
+    .log-lv.info    { color: var(--dl-green); }
+    .log-lv.debug   { color: #1d3320; }
+    .log-lv.warning { color: var(--amber); }
+    .log-lv.error   { color: var(--red-neg); }
+    .log-txt { color: #3d6040; }
+    .log-txt.info    { color: #4a8050; }
+    .log-txt.warning { color: #b87a00; }
+    .log-txt.error   { color: #b83030; }
 
     /* ======================================================================
        RESULTADOS
     ====================================================================== */
     #results-section { display: none; }
 
-    .results-header {
+    /* Cabeçalho de resultados */
+    .res-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 28px;
+      flex-wrap: wrap;
+    }
+    .res-title-wrap {}
+    .res-check {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 6px;
+    }
+    .check-badge {
+      width: 30px; height: 30px;
+      background: rgba(134,188,37,0.12);
+      border: 1px solid var(--dl-green-border);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--dl-green);
+      font-size: 13px;
+      font-weight: 900;
+    }
+    .res-title {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: var(--text-bright);
+      letter-spacing: -0.02em;
+    }
+    .res-subtitle {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-left: 42px;
+    }
+
+    .btn-dl {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      background: transparent;
+      border: 1px solid var(--dl-green-border);
+      border-radius: var(--r-sm);
+      color: var(--dl-green);
+      font-family: var(--font-sans);
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-decoration: none;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      transition: all 0.2s;
+    }
+    .btn-dl:hover {
+      background: var(--dl-green-subtle);
+      border-color: var(--dl-green);
+      box-shadow: var(--glow-green);
+    }
+
+    /* Totais */
+    .totals {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    @media (max-width: 640px) { .totals { grid-template-columns: repeat(2, 1fr); } }
+
+    .tot-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--r-md);
+      padding: 20px 18px;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.2s, border-color 0.2s;
+    }
+    .tot-card:hover { transform: translateY(-1px); }
+
+    /* Linha colorida no topo */
+    .tot-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+    }
+    .tot-card.inc::before { background: var(--green-pos); }
+    .tot-card.exc::before { background: var(--red-neg); }
+    .tot-card.alt::before { background: var(--amber); }
+    .tot-card.sem::before { background: var(--text-muted); }
+
+    .tot-card.inc { border-color: rgba(34,197,94,0.12); }
+    .tot-card.exc { border-color: rgba(239,68,68,0.12); }
+    .tot-card.alt { border-color: rgba(245,158,11,0.12); }
+    .tot-card.sem { border-color: rgba(100,116,139,0.08); }
+
+    .tot-icon { font-size: 18px; margin-bottom: 10px; opacity: 0.7; }
+    .tot-num {
+      font-size: 2.1rem;
+      font-weight: 900;
+      line-height: 1;
+      margin-bottom: 5px;
+      font-variant-numeric: tabular-nums;
+      font-family: var(--font-mono);
+    }
+    .tot-card.inc .tot-num { color: var(--green-pos); }
+    .tot-card.exc .tot-num { color: var(--red-neg); }
+    .tot-card.alt .tot-num { color: var(--amber); }
+    .tot-card.sem .tot-num { color: var(--text); }
+    .tot-lbl {
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      font-weight: 700;
+      color: var(--text-muted);
+    }
+
+    /* Tabela de blocos */
+    .table-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--r-lg);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+
+    .table-caption {
+      padding: 16px 24px;
+      border-bottom: 1px solid var(--border);
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 24px;
-      flex-wrap: wrap;
-      gap: 16px;
     }
-
-    .results-title {
-      font-size: 1.3rem;
-      font-weight: 800;
-      color: var(--text-bright);
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .results-title .check {
-      width: 34px; height: 34px;
-      background: rgba(34, 197, 94, 0.12);
-      border: 1px solid rgba(34, 197, 94, 0.3);
-      border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 15px;
-      color: var(--green);
-    }
-
-    .btn-download {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 11px 24px;
-      background: rgba(13, 211, 197, 0.08);
-      border: 1px solid rgba(13, 211, 197, 0.3);
-      border-radius: var(--radius-sm);
-      color: var(--accent-teal);
-      font-family: var(--font-sans);
-      font-size: 0.88rem;
-      font-weight: 600;
-      cursor: pointer;
-      text-decoration: none;
-      transition: all 0.2s;
-    }
-    .btn-download:hover {
-      background: rgba(13, 211, 197, 0.15);
-      box-shadow: 0 0 20px rgba(13, 211, 197, 0.15);
-      transform: translateY(-1px);
-    }
-
-    /* Totalizadores */
-    .totals-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 14px;
-      margin-bottom: 28px;
-    }
-    @media (max-width: 680px) {
-      .totals-grid { grid-template-columns: repeat(2, 1fr); }
-    }
-
-    .total-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-md);
-      padding: 20px;
-      text-align: center;
-      transition: transform 0.2s, box-shadow 0.2s;
-    }
-    .total-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-card); }
-
-    .total-card .total-icon {
-      font-size: 22px;
-      margin-bottom: 8px;
-    }
-    .total-card .total-num {
-      font-size: 2rem;
-      font-weight: 900;
-      line-height: 1;
-      margin-bottom: 6px;
-      font-variant-numeric: tabular-nums;
-    }
-    .total-card .total-label {
-      font-size: 0.7rem;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      font-weight: 600;
-      color: var(--muted);
-    }
-
-    .total-card.inc .total-num { color: var(--green); }
-    .total-card.exc .total-num { color: var(--red); }
-    .total-card.alt .total-num { color: var(--yellow); }
-    .total-card.sem .total-num { color: var(--text); }
-
-    .total-card.inc { border-color: rgba(34, 197, 94, 0.15); }
-    .total-card.exc { border-color: rgba(239, 68, 68, 0.15); }
-    .total-card.alt { border-color: rgba(245, 158, 11, 0.15); }
-    .total-card.sem { border-color: rgba(100, 116, 139, 0.15); }
-
-    /* Tabela de blocos */
-    .blocks-table-wrapper {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-lg);
-      overflow: hidden;
-      box-shadow: var(--shadow-card);
-    }
-    .blocks-table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-    .blocks-table thead th {
-      padding: 14px 18px;
-      text-align: left;
-      font-size: 0.68rem;
+    .table-caption-txt {
+      font-size: 0.75rem;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 1.5px;
-      color: var(--muted);
-      background: rgba(79, 142, 247, 0.04);
+      color: var(--text-muted);
+    }
+    .table-caption-count {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--text-dim);
+    }
+
+    table { width: 100%; border-collapse: collapse; }
+
+    thead th {
+      padding: 12px 20px;
+      text-align: left;
+      font-size: 9px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--text-dim);
+      background: rgba(0,0,0,0.2);
       border-bottom: 1px solid var(--border);
       white-space: nowrap;
     }
-    .blocks-table thead th:not(:first-child) { text-align: center; }
+    thead th:not(:first-child) { text-align: center; }
 
-    .blocks-table tbody tr {
-      border-bottom: 1px solid rgba(99, 140, 255, 0.05);
+    tbody tr {
+      border-bottom: 1px solid rgba(134,188,37,0.04);
       transition: background 0.15s;
     }
-    .blocks-table tbody tr:last-child { border-bottom: none; }
-    .blocks-table tbody tr:hover { background: rgba(79, 142, 247, 0.04); }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: rgba(134,188,37,0.025); }
 
-    .blocks-table td {
-      padding: 13px 18px;
-      font-size: 0.82rem;
+    tbody td {
+      padding: 13px 20px;
+      font-size: 0.8rem;
     }
-    .blocks-table td:not(:first-child) { text-align: center; }
+    tbody td:not(:first-child) { text-align: center; }
 
-    .bloco-name {
+    .blk-nm {
       font-family: var(--font-mono);
       font-weight: 700;
       color: var(--text-bright);
-      font-size: 0.88rem;
+      font-size: 0.84rem;
     }
-    .bloco-tag {
+    .blk-tag {
       display: inline-block;
       margin-left: 8px;
-      font-size: 0.6rem;
-      font-weight: 700;
+      font-size: 9px;
+      font-weight: 800;
       letter-spacing: 1px;
       padding: 2px 7px;
-      border-radius: 999px;
+      border-radius: 3px;
       vertical-align: middle;
     }
-    .tag-novo     { background: rgba(34, 197, 94, 0.12); color: var(--green); border: 1px solid rgba(34, 197, 94, 0.25); }
-    .tag-removido { background: rgba(239, 68, 68, 0.1);  color: var(--red);   border: 1px solid rgba(239, 68, 68, 0.25); }
-    .tag-auto     { background: rgba(245, 158, 11, 0.1); color: var(--yellow);border: 1px solid rgba(245, 158, 11, 0.25); }
+    .tag-n  { background: rgba(34,197,94,0.08);  color: var(--green-pos); border: 1px solid rgba(34,197,94,0.2); }
+    .tag-r  { background: rgba(239,68,68,0.08);  color: var(--red-neg);   border: 1px solid rgba(239,68,68,0.2); }
+    .tag-a  { background: rgba(245,158,11,0.08); color: var(--amber);     border: 1px solid rgba(245,158,11,0.2); }
 
-    .num-inc { color: var(--green); font-weight: 700; font-family: var(--font-mono); }
-    .num-exc { color: var(--red);   font-weight: 700; font-family: var(--font-mono); }
-    .num-alt { color: var(--yellow);font-weight: 700; font-family: var(--font-mono); }
-    .num-sem { color: var(--muted); font-family: var(--font-mono); }
-    .num-zero { color: #1e3050; font-family: var(--font-mono); }
+    .n-inc { color: var(--green-pos); font-weight: 700; font-family: var(--font-mono); }
+    .n-exc { color: var(--red-neg);   font-weight: 700; font-family: var(--font-mono); }
+    .n-alt { color: var(--amber);     font-weight: 700; font-family: var(--font-mono); }
+    .n-sem { color: var(--text-muted); font-family: var(--font-mono); }
+    .n-zer { color: var(--text-dim);  font-family: var(--font-mono); }
 
-    /* Novo job button */
-    .btn-novo {
-      display: flex;
+    /* Botão nova comparação */
+    .btn-reset {
+      margin-top: 20px;
+      display: inline-flex;
       align-items: center;
       gap: 8px;
-      margin-top: 24px;
-      padding: 11px 22px;
+      padding: 10px 20px;
       background: transparent;
       border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      color: var(--muted);
+      border-radius: var(--r-sm);
+      color: var(--text-muted);
       font-family: var(--font-sans);
-      font-size: 0.85rem;
-      font-weight: 500;
+      font-size: 0.8rem;
+      font-weight: 600;
       cursor: pointer;
       transition: all 0.2s;
     }
-    .btn-novo:hover {
-      border-color: var(--accent-blue);
-      color: var(--accent-blue);
-    }
-
-    /* ======================================================================
-       ALERTA DE ERRO
-    ====================================================================== */
-    .alert-error {
-      display: none;
-      background: rgba(239, 68, 68, 0.08);
-      border: 1px solid rgba(239, 68, 68, 0.3);
-      border-radius: var(--radius-md);
-      padding: 16px 20px;
-      font-size: 0.85rem;
-      color: #f87171;
-      margin-bottom: 20px;
+    .btn-reset:hover {
+      border-color: var(--dl-green-border);
+      color: var(--dl-green);
     }
 
     /* ======================================================================
        FOOTER
     ====================================================================== */
     footer {
-      text-align: center;
-      padding: 32px 0;
-      font-size: 0.72rem;
-      color: #283650;
+      border-top: 1px solid var(--border);
+      padding: 28px 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .footer-brand { display: flex; align-items: center; gap: 8px; }
+    .footer-wordmark {
+      font-size: 13px;
+      font-weight: 700;
+      color: #fff;
+    }
+    .footer-wordmark .dot {
+      display: inline-block;
+      width: 5px;
+      height: 5px;
+      background: var(--dl-green);
+      border-radius: 50%;
+      margin-left: 1px;
+      vertical-align: super;
+    }
+    .footer-copy {
+      font-size: 10px;
+      color: var(--text-dim);
       letter-spacing: 0.5px;
     }
+    .footer-right {
+      font-size: 10px;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
 
     /* ======================================================================
-       ANIMAÇÕES ENTRADA
+       ANIMAÇÕES DE ENTRADA
     ====================================================================== */
-    @keyframes fade-up {
-      from { opacity: 0; transform: translateY(24px); }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
       to   { opacity: 1; transform: translateY(0); }
     }
-
-    .fade-up { animation: fade-up 0.5s ease forwards; }
-    .fade-up-2 { animation: fade-up 0.5s 0.1s ease forwards; opacity: 0; }
-    .fade-up-3 { animation: fade-up 0.5s 0.2s ease forwards; opacity: 0; }
-    .fade-up-4 { animation: fade-up 0.5s 0.3s ease forwards; opacity: 0; }
-
-    /* ======================================================================
-       COUNTER ANIMATION
-    ====================================================================== */
-    .count-anim { display: inline-block; }
-
-    /* ======================================================================
-       DIVIDER
-    ====================================================================== */
-    .section-divider {
-      height: 1px;
-      background: linear-gradient(90deg, transparent, var(--border), transparent);
-      margin: 32px 0;
-    }
+    .fu  { animation: fadeUp 0.45s ease forwards; }
+    .fu2 { animation: fadeUp 0.45s 0.08s ease forwards; opacity: 0; }
+    .fu3 { animation: fadeUp 0.45s 0.16s ease forwards; opacity: 0; }
+    .fu4 { animation: fadeUp 0.45s 0.24s ease forwards; opacity: 0; }
   </style>
 </head>
 <body>
 
-  <!-- Background Orbs -->
-  <div class="bg-orbs" aria-hidden="true">
-    <div class="orb orb-1"></div>
-    <div class="orb orb-2"></div>
-    <div class="orb orb-3"></div>
+  <!-- Background -->
+  <div class="bg-grid" aria-hidden="true"></div>
+  <div class="bg-orb"   aria-hidden="true"></div>
+  <div class="bg-orb-2" aria-hidden="true"></div>
+
+  <!-- ====== TOPBAR DELOITTE ====== -->
+  <div class="topbar">
+    <div class="topbar-brand">
+      <span class="wordmark">Deloitte<span class="dot"></span></span>
+    </div>
+    <div class="topbar-right">
+      <span class="topbar-tag">Tax &amp; Legal</span>
+      <div class="topbar-divider"></div>
+      <span class="topbar-label">ECF Comparador</span>
+    </div>
   </div>
 
-  <div class="app-wrapper">
+  <!-- ====== APP ====== -->
+  <div class="app">
 
-    <!-- ====== HEADER ====== -->
-    <header class="fade-up">
-      <div class="logo-badge">
-        <div class="badge-icon">📊</div>
-        <span>SPED · ECF · Revisão Automática</span>
+    <!-- HEADER -->
+    <header class="fu">
+      <div class="header-eyebrow">
+        <div class="eyebrow-line"></div>
+        <span class="eyebrow-text">Escrituração Contábil Fiscal</span>
       </div>
-      <h1>ECF <span class="grad">Comparador</span></h1>
-      <p class="subtitle">
-        Envie os dois arquivos de Escrituração Contábil Fiscal e receba um relatório completo de revisão por bloco, com diferenças destacadas.
+
+      <h1>Revisão de <em>ECF</em><br />por Bloco</h1>
+
+      <p class="header-desc">
+        Compare dois exercícios fiscais automaticamente. O sistema identifica registros incluídos, excluídos e alterados em cada bloco da ECF, gerando um relatório detalhado pronto para revisão.
       </p>
+
+      <div class="header-stats">
+        <div class="hstat">
+          <span class="hstat-num"><span>70+</span></span>
+          <span class="hstat-label">Blocos mapeados</span>
+        </div>
+        <div class="hstat-sep"></div>
+        <div class="hstat">
+          <span class="hstat-num"><span>4</span> status</span>
+          <span class="hstat-label">Por registro</span>
+        </div>
+        <div class="hstat-sep"></div>
+        <div class="hstat">
+          <span class="hstat-num"><span>&lt; 1s</span></span>
+          <span class="hstat-label">Processamento</span>
+        </div>
+        <div class="hstat-sep"></div>
+        <div class="hstat">
+          <span class="hstat-num">.xlsx</span>
+          <span class="hstat-label">Saída formatada</span>
+        </div>
+      </div>
     </header>
 
-    <!-- ====== ALERTA DE ERRO ====== -->
-    <div id="alert-error" class="alert-error" role="alert"></div>
+    <div class="divider"></div>
+
+    <!-- ALERTA -->
+    <div id="alert-box" class="alert" role="alert"></div>
 
     <!-- ====== UPLOAD ====== -->
     <div id="upload-section">
 
-      <p class="section-title fade-up-2">1. Selecione os arquivos ECF</p>
+      <div class="section-eyebrow fu2">
+        <div class="section-step">1</div>
+        <span class="section-label">Selecione os arquivos ECF</span>
+      </div>
 
-      <div class="upload-grid fade-up-2">
-        <!-- Drop zone ANTERIOR -->
-        <div class="drop-zone" id="zone-anterior" role="button" tabindex="0" aria-label="Upload ECF ano anterior">
-          <div class="drop-label">ECF Anterior</div>
-          <div class="drop-icon">📅</div>
-          <p class="drop-text">Arraste ou clique para selecionar</p>
-          <p class="drop-hint">Excel do exercício anterior (.xlsx, .xls)</p>
-          <div class="file-info" id="file-info-ant">
-            <span id="file-name-ant"></span>
-            <span class="file-remove" id="remove-ant" title="Remover">✕</span>
+      <div class="upload-grid fu2">
+
+        <!-- ANTERIOR -->
+        <div class="drop-zone" id="zone-ant" role="button" tabindex="0">
+          <span class="drop-zone-year" id="yr-ant">Anterior</span>
+          <div class="drop-icon-wrap">📋</div>
+          <div class="drop-type">ECF Anterior</div>
+          <p class="drop-title">Arraste ou clique para selecionar</p>
+          <p class="drop-hint">Exercício anterior<br/>.xlsx · .xls · .xlsm · .xlsb</p>
+          <div class="file-chip" id="chip-ant">
+            <span class="file-chip-name" id="chip-ant-name"></span>
+            <span class="file-chip-x" id="rm-ant">✕</span>
           </div>
-          <input type="file" id="input-anterior" accept=".xlsx,.xls,.xlsm,.xlsb" />
+          <input type="file" id="inp-ant" accept=".xlsx,.xls,.xlsm,.xlsb" />
         </div>
 
-        <!-- Drop zone ATUAL -->
-        <div class="drop-zone" id="zone-atual" role="button" tabindex="0" aria-label="Upload ECF ano atual">
-          <div class="drop-label">ECF Atual</div>
-          <div class="drop-icon">🗂️</div>
-          <p class="drop-text">Arraste ou clique para selecionar</p>
-          <p class="drop-hint">Excel do exercício atual (.xlsx, .xls)</p>
-          <div class="file-info" id="file-info-atu">
-            <span id="file-name-atu"></span>
-            <span class="file-remove" id="remove-atu" title="Remover">✕</span>
+        <!-- ATUAL -->
+        <div class="drop-zone" id="zone-atu" role="button" tabindex="0">
+          <span class="drop-zone-year" id="yr-atu">Atual</span>
+          <div class="drop-icon-wrap">📂</div>
+          <div class="drop-type">ECF Atual</div>
+          <p class="drop-title">Arraste ou clique para selecionar</p>
+          <p class="drop-hint">Exercício atual<br/>.xlsx · .xls · .xlsm · .xlsb</p>
+          <div class="file-chip" id="chip-atu">
+            <span class="file-chip-name" id="chip-atu-name"></span>
+            <span class="file-chip-x" id="rm-atu">✕</span>
           </div>
-          <input type="file" id="input-atual" accept=".xlsx,.xls,.xlsm,.xlsb" />
+          <input type="file" id="inp-atu" accept=".xlsx,.xls,.xlsm,.xlsb" />
+        </div>
+
+      </div>
+
+      <!-- CONFIG -->
+      <div class="section-eyebrow fu3">
+        <div class="section-step">2</div>
+        <span class="section-label">Configure rótulos e nome de saída</span>
+      </div>
+
+      <div class="config-row fu3">
+        <div class="field">
+          <label class="field-label" for="f-ant">Rótulo anterior</label>
+          <input type="text" id="f-ant" value="2024" placeholder="ex: 2024" maxlength="20" />
+        </div>
+        <div class="field">
+          <label class="field-label" for="f-atu">Rótulo atual</label>
+          <input type="text" id="f-atu" value="2025" placeholder="ex: 2025" maxlength="20" />
+        </div>
+        <div class="field">
+          <label class="field-label" for="f-out">Nome do arquivo de saída</label>
+          <input type="text" id="f-out" value="ecf_revisao_deloitte" placeholder="ecf_revisao" maxlength="60" />
         </div>
       </div>
 
-      <!-- Config Row -->
-      <p class="section-title fade-up-3">2. Configure os rótulos e nome de saída</p>
-
-      <div class="config-row fade-up-3">
-        <div class="input-group">
-          <label for="label-ant">Rótulo Ano Anterior</label>
-          <input type="text" id="label-ant" value="2024" placeholder="ex: 2024" maxlength="20" />
-        </div>
-        <div class="input-group">
-          <label for="label-atu">Rótulo Ano Atual</label>
-          <input type="text" id="label-atu" value="2025" placeholder="ex: 2025" maxlength="20" />
-        </div>
-        <div class="input-group">
-          <label for="nome-saida">Nome do arquivo de saída</label>
-          <input type="text" id="nome-saida" value="ecf_revisao" placeholder="ecf_revisao" maxlength="60" />
-        </div>
-      </div>
-
-      <!-- Botão -->
-      <button class="btn-processar fade-up-4" id="btn-processar" disabled>
+      <!-- BOTÃO -->
+      <button class="btn-process fu4" id="btn-proc" disabled>
         <div class="btn-inner">
           <div class="spinner"></div>
-          <span class="btn-text-idle">⚡ Processar Comparação</span>
-          <span class="btn-text-loading">Processando...</span>
+          <span class="txt-idle">Processar Comparação</span>
+          <span class="txt-run">Processando ECF...</span>
         </div>
       </button>
 
-    </div><!-- /upload-section -->
+    </div><!-- /upload -->
 
     <!-- ====== PROGRESSO ====== -->
     <div id="progress-section">
       <div class="progress-card">
-        <div class="progress-header">
-          <span class="progress-label" id="progress-label">Iniciando...</span>
-          <span class="progress-pct" id="progress-pct">0%</span>
+        <div class="progress-head">
+          <span class="progress-title" id="pg-title">Processando</span>
+          <span class="progress-num"  id="pg-pct">0%</span>
         </div>
-        <div class="progress-bar-track">
-          <div class="progress-bar-fill" id="progress-bar"></div>
+        <div class="bar-track">
+          <div class="bar-fill" id="pg-bar"></div>
         </div>
-        <div class="progress-step-text" id="progress-step">Aguardando servidor...</div>
-        <div class="blocks-track" id="blocks-track"></div>
+        <div class="progress-step" id="pg-step">Aguardando...</div>
+        <div class="blocks-row" id="blocks-row"></div>
       </div>
     </div>
 
     <!-- ====== TERMINAL ====== -->
-    <div class="terminal-card" id="terminal-card">
-      <div class="terminal-header">
-        <div class="dot dot-r"></div>
-        <div class="dot dot-y"></div>
-        <div class="dot dot-g"></div>
-        <span class="terminal-title">ecf_comparador — log em tempo real</span>
+    <div class="terminal" id="terminal">
+      <div class="term-header">
+        <div class="term-dot t-r"></div>
+        <div class="term-dot t-y"></div>
+        <div class="term-dot t-g"></div>
+        <span class="term-title">ecf_comparador — log em tempo real</span>
       </div>
-      <div class="terminal-body" id="terminal-body"></div>
+      <div class="term-body" id="term-body"></div>
     </div>
 
     <!-- ====== RESULTADOS ====== -->
     <div id="results-section">
 
-      <div class="results-header">
-        <div class="results-title">
-          <div class="check">✓</div>
-          Revisão concluída
+      <div class="res-header">
+        <div class="res-title-wrap">
+          <div class="res-check">
+            <div class="check-badge">✓</div>
+            <span class="res-title">Comparação concluída</span>
+          </div>
+          <div class="res-subtitle">Relatório gerado com sucesso — pronto para download e revisão</div>
         </div>
-        <a href="#" class="btn-download" id="btn-download" download>
-          <span>⬇</span> Baixar Excel
+        <a href="#" id="btn-dl" class="btn-dl" download>
+          ↓ &nbsp;Baixar Excel
         </a>
       </div>
 
-      <!-- Totalizadores -->
-      <div class="totals-grid" id="totals-grid">
-        <div class="total-card inc">
-          <div class="total-icon">🟢</div>
-          <div class="total-num count-anim" id="tot-inc">0</div>
-          <div class="total-label">Incluídos</div>
+      <!-- Totais -->
+      <div class="totals">
+        <div class="tot-card inc">
+          <div class="tot-icon">▲</div>
+          <div class="tot-num" id="t-inc">0</div>
+          <div class="tot-lbl">Incluídos</div>
         </div>
-        <div class="total-card exc">
-          <div class="total-icon">🔴</div>
-          <div class="total-num count-anim" id="tot-exc">0</div>
-          <div class="total-label">Excluídos</div>
+        <div class="tot-card exc">
+          <div class="tot-icon">▼</div>
+          <div class="tot-num" id="t-exc">0</div>
+          <div class="tot-lbl">Excluídos</div>
         </div>
-        <div class="total-card alt">
-          <div class="total-icon">🟡</div>
-          <div class="total-num count-anim" id="tot-alt">0</div>
-          <div class="total-label">Alterados</div>
+        <div class="tot-card alt">
+          <div class="tot-icon">◆</div>
+          <div class="tot-num" id="t-alt">0</div>
+          <div class="tot-lbl">Alterados</div>
         </div>
-        <div class="total-card sem">
-          <div class="total-icon">⬜</div>
-          <div class="total-num count-anim" id="tot-sem">0</div>
-          <div class="total-label">Sem alteração</div>
+        <div class="tot-card sem">
+          <div class="tot-icon">●</div>
+          <div class="tot-num" id="t-sem">0</div>
+          <div class="tot-lbl">Sem alteração</div>
         </div>
       </div>
 
       <!-- Tabela de blocos -->
-      <div class="blocks-table-wrapper">
-        <table class="blocks-table" id="blocks-table">
+      <div class="table-card">
+        <div class="table-caption">
+          <span class="table-caption-txt">Resumo por Bloco ECF</span>
+          <span class="table-caption-count" id="tbl-count"></span>
+        </div>
+        <table>
           <thead>
             <tr>
-              <th>Bloco</th>
+              <th>Bloco / Registro</th>
               <th>Incluídos</th>
               <th>Excluídos</th>
               <th>Alterados</th>
               <th>Sem alteração</th>
             </tr>
           </thead>
-          <tbody id="blocks-tbody"></tbody>
+          <tbody id="tbl-body"></tbody>
         </table>
       </div>
 
-      <button class="btn-novo" id="btn-novo">↺ Nova comparação</button>
+      <button class="btn-reset" id="btn-reset">↺ &nbsp;Nova comparação</button>
 
-    </div><!-- /results-section -->
+    </div><!-- /results -->
 
-  </div><!-- /app-wrapper -->
+    <div class="divider" style="margin-top:48px"></div>
 
-  <footer>
-    ECF Comparador &nbsp;·&nbsp; Escrituração Contábil Fiscal &nbsp;·&nbsp; Revisão Automática por Bloco
-  </footer>
+    <!-- FOOTER -->
+    <footer>
+      <div class="footer-brand">
+        <span class="footer-wordmark">Deloitte<span class="dot"></span></span>
+        <span class="footer-copy">Tax &amp; Legal · ECF Comparador</span>
+      </div>
+      <span class="footer-right">© 2025 Deloitte · Internal Tool</span>
+    </footer>
 
-  <!-- ====================================================================
+  </div><!-- /app -->
+
+  <!-- =====================================================================
        JAVASCRIPT
-  ==================================================================== -->
+  ====================================================================== -->
   <script>
-    // ----- Estado -----
-    let fileAnt = null, fileAtu = null;
-    let currentJobId = null;
-    let sseSource = null;
-    let blocksKnown = {};  // bloco -> pill element
+    // ── Estado ──────────────────────────────────────────────────────────
+    let fAnt = null, fAtu = null;
+    let jobId = null, sse = null;
+    let pills = {};
 
-    // ----- Elementos -----
-    const zoneAnt    = document.getElementById('zone-anterior');
-    const zoneAtu    = document.getElementById('zone-atual');
-    const inputAnt   = document.getElementById('input-anterior');
-    const inputAtu   = document.getElementById('input-atual');
-    const infoAnt    = document.getElementById('file-info-ant');
-    const infoAtu    = document.getElementById('file-info-atu');
-    const nameAnt    = document.getElementById('file-name-ant');
-    const nameAtu    = document.getElementById('file-name-atu');
-    const removeAnt  = document.getElementById('remove-ant');
-    const removeAtu  = document.getElementById('remove-atu');
-    const btnProc    = document.getElementById('btn-processar');
-    const alertEl    = document.getElementById('alert-error');
-    const progSec    = document.getElementById('progress-section');
-    const termCard   = document.getElementById('terminal-card');
-    const termBody   = document.getElementById('terminal-body');
-    const resultSec  = document.getElementById('results-section');
-    const uploadSec  = document.getElementById('upload-section');
-    const btnDl      = document.getElementById('btn-download');
-    const btnNovo    = document.getElementById('btn-novo');
+    // ── Refs ─────────────────────────────────────────────────────────────
+    const $ = id => document.getElementById(id);
+    const zAnt = $('zone-ant'), zAtu = $('zone-atu');
+    const iAnt = $('inp-ant'),  iAtu = $('inp-atu');
+    const cAnt = $('chip-ant'), cAtu = $('chip-atu');
+    const cnAnt = $('chip-ant-name'), cnAtu = $('chip-atu-name');
+    const rmAnt = $('rm-ant'), rmAtu = $('rm-atu');
+    const btn   = $('btn-proc');
+    const alert = $('alert-box');
+    const yrAnt = $('yr-ant'), yrAtu = $('yr-atu');
 
-    // ----- Drag & Drop -----
+    // ── Labels dinâmicos no badge ─────────────────────────────────────────
+    $('f-ant').addEventListener('input', e => yrAnt.textContent = e.target.value || 'Anterior');
+    $('f-atu').addEventListener('input', e => yrAtu.textContent = e.target.value || 'Atual');
+
+    // ── Drag & Drop ──────────────────────────────────────────────────────
     function setupZone(zone, input, side) {
       zone.addEventListener('click', () => input.click());
-      zone.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') input.click(); });
+      zone.addEventListener('keydown', e => { if (e.key==='Enter'||e.key===' ') input.click(); });
 
-      ['dragenter','dragover'].forEach(evt => {
-        zone.addEventListener(evt, e => {
-          e.preventDefault();
-          zone.classList.add('drag-over');
-        });
-      });
-
-      ['dragleave','dragend'].forEach(evt => {
-        zone.addEventListener(evt, () => zone.classList.remove('drag-over'));
-      });
+      ['dragenter','dragover'].forEach(ev =>
+        zone.addEventListener(ev, e => { e.preventDefault(); zone.classList.add('drag-over'); }));
+      ['dragleave','dragend'].forEach(ev =>
+        zone.addEventListener(ev, () => zone.classList.remove('drag-over')));
 
       zone.addEventListener('drop', e => {
-        e.preventDefault();
-        zone.classList.remove('drag-over');
-        const f = e.dataTransfer.files[0];
-        if (f) applyFile(f, side);
+        e.preventDefault(); zone.classList.remove('drag-over');
+        if (e.dataTransfer.files[0]) setFile(e.dataTransfer.files[0], side);
       });
-
-      input.addEventListener('change', () => {
-        if (input.files[0]) applyFile(input.files[0], side);
-      });
+      input.addEventListener('change', () => { if (input.files[0]) setFile(input.files[0], side); });
     }
 
-    function applyFile(file, side) {
-      const ext = file.name.split('.').pop().toLowerCase();
+    function setFile(f, side) {
+      const ext = f.name.split('.').pop().toLowerCase();
       if (!['xlsx','xls','xlsm','xlsb'].includes(ext)) {
-        showAlert(`"${file.name}" não é um arquivo Excel válido.`);
-        return;
+        showAlert(`"${f.name}" não é um arquivo Excel válido.`); return;
       }
       hideAlert();
       if (side === 'ant') {
-        fileAnt = file;
-        nameAnt.textContent = file.name;
-        infoAnt.style.display = 'flex';
-        zoneAnt.classList.add('has-file');
+        fAnt = f; cnAnt.textContent = f.name;
+        zAnt.classList.add('has-file');
       } else {
-        fileAtu = file;
-        nameAtu.textContent = file.name;
-        infoAtu.style.display = 'flex';
-        zoneAtu.classList.add('has-file');
+        fAtu = f; cnAtu.textContent = f.name;
+        zAtu.classList.add('has-file');
       }
-      updateBtn();
+      syncBtn();
     }
 
-    function removeFile(side) {
-      if (side === 'ant') {
-        fileAnt = null;
-        nameAnt.textContent = '';
-        infoAnt.style.display = 'none';
-        zoneAnt.classList.remove('has-file');
-        inputAnt.value = '';
-      } else {
-        fileAtu = null;
-        nameAtu.textContent = '';
-        infoAtu.style.display = 'none';
-        zoneAtu.classList.remove('has-file');
-        inputAtu.value = '';
-      }
-      updateBtn();
+    function clearFile(side) {
+      if (side === 'ant') { fAnt=null; cnAnt.textContent=''; zAnt.classList.remove('has-file'); iAnt.value=''; }
+      else                { fAtu=null; cnAtu.textContent=''; zAtu.classList.remove('has-file'); iAtu.value=''; }
+      syncBtn();
     }
 
-    setupZone(zoneAnt, inputAnt, 'ant');
-    setupZone(zoneAtu, inputAtu, 'atu');
-    removeAnt.addEventListener('click', e => { e.stopPropagation(); removeFile('ant'); });
-    removeAtu.addEventListener('click', e => { e.stopPropagation(); removeFile('atu'); });
+    setupZone(zAnt, iAnt, 'ant');
+    setupZone(zAtu, iAtu, 'atu');
+    rmAnt.addEventListener('click', e => { e.stopPropagation(); clearFile('ant'); });
+    rmAtu.addEventListener('click', e => { e.stopPropagation(); clearFile('atu'); });
+    function syncBtn() { btn.disabled = !(fAnt && fAtu); }
 
-    function updateBtn() {
-      btnProc.disabled = !(fileAnt && fileAtu);
-    }
+    // ── Alertas ──────────────────────────────────────────────────────────
+    function showAlert(msg) { alert.textContent = '⚠ ' + msg; alert.style.display = 'block'; }
+    function hideAlert()     { alert.style.display = 'none'; }
 
-    // ----- Alertas -----
-    function showAlert(msg) {
-      alertEl.textContent = '⚠ ' + msg;
-      alertEl.style.display = 'block';
-    }
-    function hideAlert() {
-      alertEl.style.display = 'none';
-    }
-
-    // ----- Processar -----
-    btnProc.addEventListener('click', async () => {
-      if (!fileAnt || !fileAtu) return;
+    // ── Processar ────────────────────────────────────────────────────────
+    btn.addEventListener('click', async () => {
+      if (!fAnt || !fAtu) return;
       hideAlert();
 
-      const labelAnt  = document.getElementById('label-ant').value.trim() || '2024';
-      const labelAtu  = document.getElementById('label-atu').value.trim() || '2025';
-      const nomeSaida = document.getElementById('nome-saida').value.trim() || 'ecf_revisao';
-
-      // Monta FormData
       const fd = new FormData();
-      fd.append('arquivo_anterior', fileAnt);
-      fd.append('arquivo_atual', fileAtu);
-      fd.append('label_anterior', labelAnt);
-      fd.append('label_atual', labelAtu);
-      fd.append('nome_saida', nomeSaida);
+      fd.append('arquivo_anterior', fAnt);
+      fd.append('arquivo_atual',    fAtu);
+      fd.append('label_anterior',   $('f-ant').value.trim() || '2024');
+      fd.append('label_atual',      $('f-atu').value.trim() || '2025');
+      fd.append('nome_saida',       $('f-out').value.trim() || 'ecf_revisao');
 
-      // UI: loading
-      btnProc.classList.add('loading');
-      btnProc.disabled = true;
+      btn.classList.add('loading');
+      btn.disabled = true;
 
       try {
-        const res = await fetch('/processar', { method: 'POST', body: fd });
+        const res  = await fetch('/processar', { method: 'POST', body: fd });
         const data = await res.json();
+        if (!res.ok || data.erro) { showAlert(data.erro || 'Erro ao iniciar.'); resetBtn(); return; }
 
-        if (!res.ok || data.erro) {
-          showAlert(data.erro || 'Erro ao iniciar o processamento.');
-          btnProc.classList.remove('loading');
-          btnProc.disabled = false;
-          return;
-        }
-
-        currentJobId = data.job_id;
-        iniciarSSE(currentJobId, labelAnt, labelAtu);
-
-        // Mostra progresso
-        uploadSec.style.display = 'none';
-        progSec.style.display = 'block';
-        termCard.style.display = 'block';
-        resultSec.style.display = 'none';
-
-      } catch (err) {
-        showAlert('Falha na conexão com o servidor: ' + err.message);
-        btnProc.classList.remove('loading');
-        btnProc.disabled = false;
-      }
+        jobId = data.job_id;
+        $('upload-section').style.display   = 'none';
+        $('progress-section').style.display = 'block';
+        $('terminal').style.display         = 'block';
+        $('results-section').style.display  = 'none';
+        openSSE(jobId);
+      } catch(e) { showAlert('Falha de conexão: ' + e.message); resetBtn(); }
     });
 
-    // ----- SSE -----
-    function iniciarSSE(jobId) {
-      if (sseSource) sseSource.close();
-      blocksKnown = {};
-      document.getElementById('blocks-track').innerHTML = '';
-      termBody.innerHTML = '';
-      setProgress(0, 'Conectando...');
+    function resetBtn() { btn.classList.remove('loading'); btn.disabled = !(fAnt && fAtu); }
 
-      sseSource = new EventSource(`/stream/${jobId}`);
+    // ── SSE ──────────────────────────────────────────────────────────────
+    function openSSE(id) {
+      if (sse) sse.close();
+      pills = {};
+      $('blocks-row').innerHTML = '';
+      $('term-body').innerHTML  = '';
+      setProgress(0, 'Conectando ao servidor...');
 
-      sseSource.onmessage = (e) => {
+      sse = new EventSource(`/stream/${id}`);
+      sse.onmessage = e => {
         const ev = JSON.parse(e.data);
-
         if (ev.type === 'heartbeat') return;
-
-        if (ev.type === 'log') {
-          appendLog(ev.level, ev.module, ev.message);
-        }
-
-        if (ev.type === 'progresso') {
-          setProgress(ev.valor, ev.texto);
-        }
-
-        if (ev.type === 'bloco') {
-          markBlock(ev.nome, ev.idx, ev.total);
-        }
-
-        if (ev.type === 'concluido') {
-          sseSource.close();
-          setProgress(100, 'Concluido!');
-          appendLog('info', 'main', '[CONCLUIDO] Processamento encerrado com sucesso.');
-          setTimeout(() => exibirResultados(ev.resumo, jobId), 600);
-        }
-
-        if (ev.type === 'erro') {
-          sseSource.close();
-          appendLog('error', 'main', '[ERRO] ' + ev.message);
-          showAlert('Erro no processamento: ' + ev.message);
-          setTimeout(() => {
-            progSec.style.display = 'none';
-            uploadSec.style.display = 'block';
-            btnProc.classList.remove('loading');
-            btnProc.disabled = false;
-          }, 1500);
-        }
-      };
-
-      sseSource.onerror = () => {
-        appendLog('warning', 'sse', 'Conexão SSE encerrada.');
+        if (ev.type === 'log')       logLine(ev.level, ev.module, ev.message);
+        if (ev.type === 'progresso') setProgress(ev.valor, ev.texto);
+        if (ev.type === 'bloco')     markPill(ev.nome);
+        if (ev.type === 'concluido') { sse.close(); setProgress(100,'Concluido!'); logLine('info','main','Processamento concluido.'); setTimeout(() => showResults(ev.resumo, id), 500); }
+        if (ev.type === 'erro')      { sse.close(); logLine('error','main','ERRO: '+ev.message); showAlert('Erro: '+ev.message); setTimeout(()=>{ $('progress-section').style.display='none'; $('upload-section').style.display='block'; resetBtn(); }, 1500); }
       };
     }
 
-    // ----- Progresso -----
-    function setProgress(pct, texto) {
-      document.getElementById('progress-bar').style.width = pct + '%';
-      document.getElementById('progress-pct').textContent = pct + '%';
-      document.getElementById('progress-step').textContent = texto;
-      document.getElementById('progress-label').textContent =
-        pct < 100 ? 'Processando...' : 'Concluído!';
+    // ── Progresso ────────────────────────────────────────────────────────
+    function setProgress(pct, txt) {
+      $('pg-bar').style.width  = pct + '%';
+      $('pg-pct').textContent  = pct + '%';
+      $('pg-step').textContent = txt;
+      $('pg-title').textContent = pct < 100 ? 'Processando' : 'Concluido';
     }
 
-    // ----- Blocos -----
-    function markBlock(nome, idx, total) {
-      const track = document.getElementById('blocks-track');
-      // desativa o anterior ativo
-      Object.values(blocksKnown).forEach(p => p.classList.remove('active'));
-
-      if (!blocksKnown[nome]) {
-        const pill = document.createElement('span');
-        pill.className = 'block-pill active';
-        pill.textContent = nome;
-        track.appendChild(pill);
-        blocksKnown[nome] = pill;
+    function markPill(nome) {
+      Object.values(pills).forEach(p => p.classList.remove('active'));
+      if (!pills[nome]) {
+        const p = document.createElement('span');
+        p.className = 'blk-pill active';
+        p.textContent = nome;
+        $('blocks-row').appendChild(p);
+        pills[nome] = p;
       } else {
-        blocksKnown[nome].classList.remove('done');
-        blocksKnown[nome].classList.add('active');
+        pills[nome].classList.remove('done');
+        pills[nome].classList.add('active');
       }
-
-      // marca anterior como done
-      const nomes = Object.keys(blocksKnown);
-      const idxAtual = nomes.indexOf(nome);
-      if (idxAtual > 0) {
-        blocksKnown[nomes[idxAtual - 1]].classList.remove('active');
-        blocksKnown[nomes[idxAtual - 1]].classList.add('done');
-      }
+      const nms = Object.keys(pills);
+      const idx = nms.indexOf(nome);
+      if (idx > 0) { pills[nms[idx-1]].classList.remove('active'); pills[nms[idx-1]].classList.add('done'); }
     }
 
-    // ----- Terminal -----
-    function appendLog(level, module, msg) {
-      const now = new Date();
-      const ts = now.toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
-
-      const line = document.createElement('div');
-      line.className = 'log-line';
-
-      const levelMap = { info: 'INFO', debug: 'DEBUG', warning: 'WARN', error: 'ERROR' };
-      const levelLabel = levelMap[level] || level.toUpperCase();
-
-      line.innerHTML = `
-        <span class="log-time">${ts}</span>
-        <span class="log-level ${level}">${levelLabel.padEnd(5)}</span>
-        <span class="log-msg ${level}">${escapeHtml(msg)}</span>
-      `;
-
-      termBody.appendChild(line);
-      // Auto-scroll
-      termBody.scrollTop = termBody.scrollHeight;
+    // ── Terminal ─────────────────────────────────────────────────────────
+    function logLine(level, mod, msg) {
+      const ts = new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+      const lbl = {info:'INFO ',debug:'DEBUG',warning:'WARN ',error:'ERROR'}[level]||level.toUpperCase();
+      const row = document.createElement('div');
+      row.className = 'log-row';
+      row.innerHTML = `<span class="log-ts">${ts}</span><span class="log-lv ${level}">${lbl}</span><span class="log-txt ${level}">${esc(msg)}</span>`;
+      $('term-body').appendChild(row);
+      $('term-body').scrollTop = $('term-body').scrollHeight;
     }
+    function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
-    function escapeHtml(str) {
-      return String(str)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;');
-    }
+    // ── Resultados ───────────────────────────────────────────────────────
+    function showResults(resumo, id) {
+      $('progress-section').style.display = 'none';
+      $('btn-dl').href = `/download/${id}`;
 
-    // ----- Resultados -----
-    function exibirResultados(resumo, jobId) {
-      progSec.style.display = 'none';
+      count('t-inc', resumo.totais.incluidos);
+      count('t-exc', resumo.totais.excluidos);
+      count('t-alt', resumo.totais.alterados);
+      count('t-sem', resumo.totais.sem_alteracao);
 
-      // Download link
-      btnDl.href = `/download/${jobId}`;
-
-      // Totais com animação de contagem
-      animateCount('tot-inc', resumo.totais.incluidos);
-      animateCount('tot-exc', resumo.totais.excluidos);
-      animateCount('tot-alt', resumo.totais.alterados);
-      animateCount('tot-sem', resumo.totais.sem_alteracao);
-
-      // Tabela de blocos
-      const tbody = document.getElementById('blocks-tbody');
+      const tbody = $('tbl-body');
       tbody.innerHTML = '';
+      $('tbl-count').textContent = resumo.blocos.length + ' blocos';
+
       resumo.blocos.forEach(b => {
         const tr = document.createElement('tr');
-
-        let tagHtml = '';
-        if (b.tag === 'novo')     tagHtml = '<span class="bloco-tag tag-novo">NOVO</span>';
-        if (b.tag === 'removido') tagHtml = '<span class="bloco-tag tag-removido">REMOVIDO</span>';
-        if (b.tag === 'auto')     tagHtml = '<span class="bloco-tag tag-auto">CHAVE AUTO</span>';
-
+        let tag = '';
+        if (b.tag==='novo')     tag = '<span class="blk-tag tag-n">NOVO</span>';
+        if (b.tag==='removido') tag = '<span class="blk-tag tag-r">REMOVIDO</span>';
+        if (b.tag==='auto')     tag = '<span class="blk-tag tag-a">AUTO</span>';
         tr.innerHTML = `
-          <td><span class="bloco-name">${escapeHtml(b.bloco)}</span>${tagHtml}</td>
-          <td><span class="${b.incluidos > 0 ? 'num-inc' : 'num-zero'}">+${b.incluidos}</span></td>
-          <td><span class="${b.excluidos > 0 ? 'num-exc' : 'num-zero'}">-${b.excluidos}</span></td>
-          <td><span class="${b.alterados > 0 ? 'num-alt' : 'num-zero'}">~${b.alterados}</span></td>
-          <td><span class="${b.sem_alteracao > 0 ? 'num-sem' : 'num-zero'}">${b.sem_alteracao}</span></td>
-        `;
+          <td><span class="blk-nm">${esc(b.bloco)}</span>${tag}</td>
+          <td><span class="${b.incluidos>0?'n-inc':'n-zer'}">+${b.incluidos}</span></td>
+          <td><span class="${b.excluidos>0?'n-exc':'n-zer'}">-${b.excluidos}</span></td>
+          <td><span class="${b.alterados>0?'n-alt':'n-zer'}">~${b.alterados}</span></td>
+          <td><span class="${b.sem_alteracao>0?'n-sem':'n-zer'}">${b.sem_alteracao}</span></td>`;
         tbody.appendChild(tr);
       });
 
-      // Marca todos os blocos como done no terminal
-      Object.values(blocksKnown).forEach(p => {
-        p.classList.remove('active');
-        p.classList.add('done');
-      });
-
-      resultSec.style.display = 'block';
-      resultSec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      Object.values(pills).forEach(p => { p.classList.remove('active'); p.classList.add('done'); });
+      $('results-section').style.display = 'block';
+      $('results-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
-    function animateCount(elId, target) {
-      const el = document.getElementById(elId);
-      const duration = 900;
-      const start = performance.now();
-      const from = 0;
-
-      function step(now) {
-        const elapsed = now - start;
-        const progress = Math.min(elapsed / duration, 1);
-        const ease = 1 - Math.pow(1 - progress, 3);
-        el.textContent = Math.round(from + (target - from) * ease);
-        if (progress < 1) requestAnimationFrame(step);
-      }
+    function count(id, target) {
+      const el = $(id); const dur = 800; const t0 = performance.now();
+      const step = now => {
+        const p = Math.min((now-t0)/dur, 1);
+        el.textContent = Math.round(target * (1-Math.pow(1-p,3)));
+        if (p < 1) requestAnimationFrame(step);
+      };
       requestAnimationFrame(step);
     }
 
-    // ----- Nova comparação -----
-    btnNovo.addEventListener('click', () => {
-      resultSec.style.display = 'none';
-      termCard.style.display = 'none';
-      termBody.innerHTML = '';
-
-      fileAnt = null; fileAtu = null;
-      nameAnt.textContent = ''; nameAtu.textContent = '';
-      infoAnt.style.display = 'none'; infoAtu.style.display = 'none';
-      zoneAnt.classList.remove('has-file'); zoneAtu.classList.remove('has-file');
-      inputAnt.value = ''; inputAtu.value = '';
-
-      blocksKnown = {};
-      document.getElementById('blocks-track').innerHTML = '';
-
-      btnProc.classList.remove('loading');
-      btnProc.disabled = true;
+    // ── Reset ────────────────────────────────────────────────────────────
+    $('btn-reset').addEventListener('click', () => {
+      $('results-section').style.display = 'none';
+      $('terminal').style.display        = 'none';
+      $('term-body').innerHTML           = '';
+      fAnt=null; fAtu=null;
+      cnAnt.textContent=''; cnAtu.textContent='';
+      zAnt.classList.remove('has-file'); zAtu.classList.remove('has-file');
+      iAnt.value=''; iAtu.value='';
+      pills = {}; $('blocks-row').innerHTML = '';
+      btn.classList.remove('loading'); btn.disabled = true;
       hideAlert();
-
-      uploadSec.style.display = 'block';
+      $('upload-section').style.display = 'block';
       window.scrollTo({ top: 0, behavior: 'smooth' });
     });
   </script>
